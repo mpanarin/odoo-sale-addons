@@ -1,4 +1,5 @@
 <odoo>
+
     <template id="cart" inherit_id="website_sale.cart">
         <xpath expr="//div[hasclass('oe_website_sale')]/div[hasclass('row')][1]" position="before">
             <t t-set="credit_point_limit_error" t-value="request.session.pop('credit_point_limit_error', None)"/>
@@ -11,4 +12,5 @@
             </div>
         </xpath>
     </template>
+
 </odoo>
