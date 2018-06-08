@@ -17,7 +17,9 @@ class WebsiteSale(WebsiteSale):
             return redirection
         else:
             try:
-                order.credit_point_check()
+                # we need to check rights on a specific user
+                # instead of admin, as website uses sudo
+                order.credit_point_check(request.env.user)
             except UserError as exc:
                 # error msg if not enought points
                 request.session['credit_point_limit_error'] = exc.name
