@@ -13,6 +13,16 @@ class TestSaleOrder(TestSale):
         self.product.list_price = 10
         self.product.currency_id = \
             self.env['res.partner']._default_credit_point_currency_id()
+        self.admin = self.env['res.users'].browse(1)
+        self.admin.groups_id = [(4, self.env.ref(
+            'sale_credit_point.group_manage_credit_point'
+        ).id)]
+        self.portal_user = self.env["res.users"].create({
+            'login': 'Ducky_McDuckface',
+            'name': 'Ducky McDuckface',
+            'email': 'duck@tales.woohoo',
+        })
+        self.portal_user.partner_id.credit_point = 0
 
     def _create_so(self):
         self.product = self.products['prod_order']
@@ -78,3 +88,15 @@ class TestSaleOrder(TestSale):
         so2.action_cancel()
         self.assertEqual(so2.state, 'cancel')
         self.assertEqual(so2.partner_id.credit_point, 100)
+
+    def test_so_credit_check_user(self):
+        so = self._create_so()
+        so.partner_id.credit_point = 0
+        with self.assertRaises(exceptions.UserError):
+            # portal user doesn't have the rights
+            so.sudo(self.portal_user.id).credit_point_check()
+        with self.assertRaises(exceptions.UserError):
+            # nor can handle it via sudo with passing of the user
+            so.sudo().credit_point_check(self.portal_user)
+        # admin still can confirm it without check
+        self.assertTrue(so.sudo().credit_point_check() is None)
