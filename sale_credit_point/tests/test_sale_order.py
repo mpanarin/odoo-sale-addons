@@ -13,15 +13,10 @@ class TestSaleOrder(TestSale):
         self.product.list_price = 10
         self.product.currency_id = \
             self.env['res.partner']._default_credit_point_currency_id()
-        self.admin = self.env['res.users'].browse(1)
-        self.admin.groups_id = [(4, self.env.ref(
+        self.env.user.groups_id = [(4, self.env.ref(
             'sale_credit_point.group_manage_credit_point'
         ).id)]
-        self.portal_user = self.env["res.users"].create({
-            'login': 'Ducky_McDuckface',
-            'name': 'Ducky McDuckface',
-            'email': 'duck@tales.woohoo',
-        })
+        self.portal_user = self.env.ref("base.demo_user0")
         self.portal_user.partner_id.credit_point = 0
 
     def _create_so(self):
